@@ -1,0 +1,53 @@
+{
+  "skill_name": "disk-cleanup",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My Mac Mini M4 with 500GB drive is showing only 30GB free. I have an external 4TB SSD called BackupDrive. Can you figure out what's eating all my space and help me clean it up? I'm a developer who uses Node, Python, and Rust.",
+      "expected_output": "Should ask clarifying questions about symptoms, comfort level, and priorities. Then run a comprehensive disk audit covering APFS volumes, user directories, Library caches, dot-folders, TM snapshots, and cloud sync. Present findings as a ranked table with actionable recommendations grouped by safety tier. Generate a markdown report file.",
+      "files": [],
+      "expectations": [
+        "Asks at least one clarifying question before running audit commands",
+        "Checks APFS volume breakdown with diskutil",
+        "Checks Time Machine local snapshots with tmutil",
+        "Scans ~/Library/Caches and ~/Library/Application Support",
+        "Scans developer dot-folders (~/.npm, ~/.cargo, ~/.rustup, etc.)",
+        "Presents findings in a table format ranked by size",
+        "Groups recommendations into safety tiers (safe/move/consider)",
+        "Provides exact cleanup commands the user can approve",
+        "Generates a markdown report file",
+        "Never runs cleanup commands without asking first"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I keep getting low disk space warnings on my MacBook Pro. I'm not very technical but I know my way around Finder. I don't have any external drives. What can I do?",
+      "expected_output": "Should tailor communication to a non-technical user. Avoid terminal jargon unless explaining it. Focus on GUI-friendly recommendations where possible (e.g., 'open Storage Management' rather than 'run du -sh'). Still run the audit but present findings in plain language. Suggest getting an external drive for tier 2 recommendations.",
+      "files": [],
+      "expectations": [
+        "Uses plain language appropriate for a non-technical user",
+        "Explains technical terms when used",
+        "Runs the disk audit despite user being non-technical",
+        "Presents recommendations with GUI instructions where available",
+        "Suggests getting an external drive for file offloading",
+        "Does not overwhelm with terminal commands",
+        "Still identifies the major space consumers accurately"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm a video editor and my 2TB Mac Studio is at 85% capacity. Most of my space is Final Cut Pro libraries and Premiere caches. I have a 10TB Thunderbolt RAID called EditBay for active projects. Help me figure out a storage strategy.",
+      "expected_output": "Should recognize this is a creative professional workflow and focus on media-specific cleanup targets: render files, proxy media, optimized media, browser caches within FCP libraries, Premiere media cache. Should suggest a strategy for active vs. archive projects. Should check for Motion templates, Compressor caches, and other creative tool overhead.",
+      "files": [],
+      "expectations": [
+        "Recognizes creative professional workflow and adjusts recommendations",
+        "Checks for Final Cut Pro libraries and render files",
+        "Checks for Adobe Premiere/Media Encoder caches",
+        "Suggests a project lifecycle strategy (active on internal, archive on external)",
+        "Identifies media-specific cache locations",
+        "Does not focus heavily on developer caches like npm/cargo",
+        "Generates a markdown report file"
+      ]
+    }
+  ]
+}
