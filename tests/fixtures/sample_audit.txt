@@ -1,0 +1,86 @@
+=== DISK AUDIT 2026-07-02 09:00:00 ===
+
+--- DISK OVERVIEW ---
+Filesystem        Size    Used   Avail Capacity iused ifree %iused  Mounted on
+/dev/disk3s1s1   460Gi   410Gi    38Gi    92%    1.2M  398M    1%   /
+
+--- APFS VOLUMES ---
+APFS Container (1 found)
+|
++-- Container disk3 11111111-2222-3333-4444-555555555555
+    ====================================================
+    Capacity In Use By Volumes: 410.0 GB (89.1% used)
+
+--- TIME MACHINE LOCAL SNAPSHOTS ---
+com.apple.TimeMachine.2026-07-01-100000.local
+com.apple.TimeMachine.2026-07-01-110000.local
+com.apple.TimeMachine.2026-07-01-120000.local
+Snapshot count: 12
+
+--- TIME MACHINE DESTINATION ---
+Name          : BackupDrive
+Kind          : Local
+Mount Point   : /Volumes/BackupDrive
+
+--- TIME MACHINE EXCLUSION STATUS ---
+[Included] /Users/test/.npm
+[Included] /Users/test/.cargo
+MISSING: /Users/test/.docker
+
+--- USER DIRECTORIES ---
+183G	/Users/test/Library
+18G	/Users/test/Downloads
+2.1G	/Users/test/Desktop
+9.5G	/Users/test/Documents
+0B	/Users/test/Movies
+0B	/Users/test/Music
+4.3G	/Users/test/Pictures
+MISSING: /Users/test/Projects
+
+--- SYSTEM DIRECTORIES ---
+21G	/Applications
+MISSING: /opt/homebrew
+2.4G	/Library/Developer
+
+--- HIDDEN DOT-FOLDERS ---
+8.1G	/Users/test/.npm
+MISSING: /Users/test/.yarn
+3.5G	/Users/test/.cargo
+MISSING: /Users/test/.docker
+
+--- LIBRARY CACHES (TOP 20) ---
+12G	/Users/test/Library/Caches/com.microsoft.VSCode.ShipIt
+6.5G	/Users/test/Library/Caches/pip
+4.0G	/Users/test/Library/Caches/ms-playwright
+
+--- APPLICATION SUPPORT (TOP 15) ---
+28G	/Users/test/Library/Application Support/Google/DriveFS
+14G	/Users/test/Library/Application Support/Code
+
+--- APPLICATIONS BY SIZE (TOP 15) ---
+12G	/Applications/Xcode.app
+2.6G	/Applications/iMovie.app
+
+--- CONTAINERS ---
+9.1G	/Users/test/Library/Containers
+
+--- DOWNLOADS (TOP 15) ---
+6.0G	/Users/test/Downloads/old-installer.dmg
+3.5G	/Users/test/Downloads/archive.zip
+
+--- CLOUD SYNC ---
+Google Drive:
+28G	/Users/test/Library/Application Support/Google/DriveFS
+GoogleDrive-test@example.com
+
+iCloud:
+4.0G	/Users/test/Library/Mobile Documents
+
+Dropbox:
+MISSING: /Users/test/.dropbox
+
+--- DOCKER ---
+MISSING: /Users/test/.docker
+SKIPPED: docker system df unavailable or not permitted
+
+=== AUDIT COMPLETE ===
