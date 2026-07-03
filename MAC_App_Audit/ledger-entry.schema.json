@@ -1,0 +1,191 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mac-tools-federation/schema/ledger-entry.schema.json",
+  "title": "Ledger Entry",
+  "description": "A single decision-ledger entry produced by a federation-compliant Mac tool (e.g. mac-app-audit, FreeUp Space). One ledger file is a JSON array of these.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "entry_id",
+    "producer",
+    "producer_version",
+    "created_at",
+    "subject",
+    "verdict",
+    "confidence_basis",
+    "evidence",
+    "decision"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semver of this schema the entry was written against, e.g. '1.0.0'."
+    },
+    "entry_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable unique identifier for this entry. Recommended: deterministic hash of producer+subject.identifier so re-runs update rather than duplicate."
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short slug of the tool that wrote this entry, e.g. 'mac-app-audit', 'freeup-space'."
+    },
+    "producer_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Version of the producing tool, for debugging drift over time."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp when this entry was first created."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of the most recent re-evaluation. Omit on first write."
+    },
+    "subject": {
+      "type": "object",
+      "required": ["type", "name"],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "app",
+            "homebrew_formula",
+            "homebrew_cask",
+            "path",
+            "model",
+            "cache",
+            "other"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable name, e.g. 'keka', 'node_modules cache', 'llama-3-70b-q4'."
+        },
+        "identifier": {
+          "type": "string",
+          "description": "Stable machine identifier if one exists (bundle ID, brew formula name, absolute path, model hash). Prefer this over 'name' for entry_id derivation."
+        },
+        "path": {
+          "type": "string",
+          "description": "Filesystem path, if applicable."
+        }
+      }
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "keep",
+        "redundant",
+        "superseded",
+        "reclaimable",
+        "investigate",
+        "judgment_required",
+        "do_not_touch",
+        "not_assessed"
+      ],
+      "description": "The producer's finding. 'do_not_touch' and 'not_assessed' are always allowed to carry a lighter evidence bar than affirmative verdicts."
+    },
+    "confidence_basis": {
+      "type": "object",
+      "required": ["method", "summary"],
+      "additionalProperties": true,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "usage_telemetry",
+            "dependency_graph",
+            "web_search_citation",
+            "filesystem_stat",
+            "manual",
+            "heuristic"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One or two sentences grounding the verdict. No bare percentages without a method backing them."
+        },
+        "confidence_percent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Optional. Only meaningful when method is usage_telemetry, dependency_graph, or filesystem_stat (i.e. backed by real numbers). Omit rather than guess for manual/heuristic methods."
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Receipts backing the verdict. May be empty only when verdict is 'not_assessed'.",
+      "items": {
+        "type": "object",
+        "required": ["type", "detail"],
+        "additionalProperties": true,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["citation", "usage_stat", "filesystem_stat", "dependency", "other"]
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "value": {
+            "description": "Optional raw value backing the claim (a number, date string, etc). Left untyped intentionally."
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": true,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "accepted", "rejected", "deferred"]
+        },
+        "reason": {
+          "type": "string",
+          "description": "User's stated reason, especially valuable on 'rejected' — this is what lets a tool learn revealed preferences instead of re-suggesting the same thing."
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "revisit_after": {
+          "type": "string",
+          "format": "date",
+          "description": "If status is 'deferred', the date after which this entry should resurface."
+        }
+      }
+    },
+    "related_entries": {
+      "type": "array",
+      "description": "entry_ids this entry references — redundancy-cluster siblings within the same producer, or cross-product seam links.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

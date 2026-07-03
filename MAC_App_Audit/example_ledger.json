@@ -1,0 +1,160 @@
+[
+  {
+    "schema_version": "1.0.0",
+    "entry_id": "a1b2c3d4e5f60001",
+    "producer": "mac-app-audit",
+    "producer_version": "0.1.0",
+    "created_at": "2026-07-03T18:40:00Z",
+    "subject": {
+      "type": "homebrew_cask",
+      "name": "keka",
+      "identifier": "keka"
+    },
+    "verdict": "redundant",
+    "confidence_basis": {
+      "method": "usage_telemetry",
+      "summary": "No launch recorded in 240+ days; sevenzip and p7zip formulae installed cover the same archive formats and are actively invoked via shell history.",
+      "confidence_percent": 78
+    },
+    "evidence": [
+      {
+        "type": "usage_stat",
+        "detail": "kMDItemLastUsedDate not set / no Spotlight launch record found",
+        "value": null
+      },
+      {
+        "type": "filesystem_stat",
+        "detail": "sevenzip and p7zip both present as active Homebrew formulae, invoked in shell history within last 14 days"
+      }
+    ],
+    "decision": {
+      "status": "pending"
+    },
+    "related_entries": ["a1b2c3d4e5f60002"],
+    "notes": "Part of archive-tool redundancy cluster with rar.app and p7zip/sevenzip formulae."
+  },
+  {
+    "schema_version": "1.0.0",
+    "entry_id": "a1b2c3d4e5f60002",
+    "producer": "mac-app-audit",
+    "producer_version": "0.1.0",
+    "created_at": "2026-07-03T18:40:00Z",
+    "subject": {
+      "type": "app",
+      "name": "rar.app",
+      "path": "/Applications/rar.app"
+    },
+    "verdict": "redundant",
+    "confidence_basis": {
+      "method": "usage_telemetry",
+      "summary": "No launch recorded in 180+ days; same archive-tool cluster as keka, superseded in practice by CLI sevenzip/p7zip usage.",
+      "confidence_percent": 71
+    },
+    "evidence": [
+      {
+        "type": "usage_stat",
+        "detail": "kMDItemLastUsedDate not set / no Spotlight launch record found"
+      }
+    ],
+    "decision": {
+      "status": "rejected",
+      "reason": "Keeping for occasional RAR files from clients that other tools mishandle; low cost to keep.",
+      "decided_at": "2026-07-04T12:10:00Z"
+    },
+    "related_entries": ["a1b2c3d4e5f60001"],
+    "notes": "User rejected removal with a stated reason — do not re-suggest this specific removal on future runs; a schema-compliant producer should treat status=rejected with a reason as durable unless the underlying evidence materially changes."
+  },
+  {
+    "schema_version": "1.0.0",
+    "entry_id": "b2c3d4e5f6a70003",
+    "producer": "mac-app-audit",
+    "producer_version": "0.1.0",
+    "created_at": "2026-07-03T18:41:00Z",
+    "subject": {
+      "type": "homebrew_formula",
+      "name": "ripgrep",
+      "identifier": "ripgrep"
+    },
+    "verdict": "keep",
+    "confidence_basis": {
+      "method": "usage_telemetry",
+      "summary": "Invoked heavily in shell history (400+ calls in captured window); no ungrounded alternative claim made.",
+      "confidence_percent": 95
+    },
+    "evidence": [
+      {
+        "type": "usage_stat",
+        "detail": "412 invocations found in retroactive shell history scan, most recent today"
+      },
+      {
+        "type": "citation",
+        "detail": "ripgrep remains actively maintained with recent releases; no credible successor has displaced it as of this check.",
+        "source_url": "https://github.com/BurntSushi/ripgrep/releases",
+        "fetched_at": "2026-07-03T18:41:00Z"
+      }
+    ],
+    "decision": {
+      "status": "pending"
+    },
+    "related_entries": [],
+    "notes": "Affirmative 'still SOTA' verdict from the alternatives engine — reassurance with a date stamp, not just a removal candidate list."
+  },
+  {
+    "schema_version": "1.0.0",
+    "entry_id": "c3d4e5f6a7b80004",
+    "producer": "freeup-space",
+    "producer_version": "0.2.0",
+    "created_at": "2026-07-03T09:15:00Z",
+    "subject": {
+      "type": "model",
+      "name": "llama-3-70b-q4_0 (duplicate quantization)",
+      "path": "~/.ollama/models/blobs/sha256-<redacted>"
+    },
+    "verdict": "reclaimable",
+    "confidence_basis": {
+      "method": "filesystem_stat",
+      "summary": "Two quantizations of the same base model present; q4_0 unused since the q5_k_m variant was pulled and is the one referenced by recent Ollama runs.",
+      "confidence_percent": 82
+    },
+    "evidence": [
+      {
+        "type": "filesystem_stat",
+        "detail": "39.2 GB, last modified 61 days ago, no matching entry in Ollama's recent-run log"
+      }
+    ],
+    "decision": {
+      "status": "pending"
+    },
+    "related_entries": ["d4e5f6a7b8c90005"],
+    "notes": "Space-only finding — FreeUp Space does not judge whether Ollama itself should be kept; see mac-app-audit entry d4e5f6a7b8c90005 for the runner-level assessment this seams into."
+  },
+  {
+    "schema_version": "1.0.0",
+    "entry_id": "d4e5f6a7b8c90005",
+    "producer": "mac-app-audit",
+    "producer_version": "0.1.0",
+    "created_at": "2026-07-03T18:42:00Z",
+    "subject": {
+      "type": "app",
+      "name": "ollama",
+      "identifier": "ollama"
+    },
+    "verdict": "keep",
+    "confidence_basis": {
+      "method": "usage_telemetry",
+      "summary": "Active local-inference runner, most-used among six installed inference tools; grey-zone comparison against LM Studio/Open WebUI deferred pending a full week of rotation-scan coverage.",
+      "confidence_percent": 60
+    },
+    "evidence": [
+      {
+        "type": "usage_stat",
+        "detail": "Ollama serve process observed running; model pulls within last 7 days"
+      }
+    ],
+    "decision": {
+      "status": "pending"
+    },
+    "related_entries": ["c3d4e5f6a7b80004"],
+    "notes": "Seam link: FreeUp Space's model-storage finding (c3d4e5f6a7b80004) about duplicate quantizations references this same runner from the space-savings angle rather than the tool-choice angle."
+  }
+]

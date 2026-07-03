@@ -24,12 +24,19 @@ These rules are mandatory for all future Codex work in this repository:
 - `SKILL.md`: Claude skill instructions and behavioral workflow.
 - `README.md`: human-facing overview and installation/use instructions.
 - `GOAL.md`: project goal and implementation handoff.
+- `FEDERATION.md`: file-based federation contract between FreeUp Space and mac-app-audit.
+- `install.sh`: no-sudo installer for the `freeup-space` wrapper.
+- `uninstall.sh`: removes only the installed wrapper.
+- `MAC_App_Audit/`: flat federation contract bundle and planned mac-app-audit goal.
 - `codex/tasks.md`: task packs for Codex.
 - `scripts/disk_audit.sh`: read-only macOS disk audit.
+- `scripts/freeup_space.py`: user-facing CLI wrapper.
 - `scripts/generate_report.py`: audit-to-Markdown report generator.
 - `references/safe-cleanup-targets.md`: cleanup knowledge base.
 - `evals/evals.json`: skill evaluation scenarios.
 - `tests/smoke_test.py`: cross-platform smoke test for report generation.
+- `tests/test_cli_smoke.py`: fixture-based CLI and installer smoke test.
+- `tests/test_federation_contract.py`: fixture-based federation contract smoke test.
 
 ## Validation Commands
 
@@ -37,8 +44,31 @@ Run these before summarizing changes when editing scripts, docs that mention com
 
 ```bash
 bash -n scripts/disk_audit.sh
+bash -n install.sh
+bash -n uninstall.sh
 python3 -m py_compile scripts/generate_report.py
+python3 -m py_compile scripts/freeup_space.py
 python3 tests/smoke_test.py
+python3 tests/test_cli_smoke.py
+python3 tests/test_federation_contract.py
+```
+
+When editing federation docs or `MAC_App_Audit/`, also run:
+
+```bash
+cd MAC_App_Audit
+python3 -m py_compile validate_ledger.py test_validator.py
+python3 validate_ledger.py example_ledger.json --schema ledger-entry.schema.json
+python3 test_validator.py
+cd ..
+```
+
+When editing the v0.2 CLI surface, also smoke these direct commands:
+
+```bash
+python3 scripts/freeup_space.py --help
+python3 scripts/freeup_space.py doctor
+python3 scripts/freeup_space.py report --input tests/fixtures/sample_audit.txt --output /tmp/freeup-space-report.md
 ```
 
 On macOS only, a live manual smoke test is:
