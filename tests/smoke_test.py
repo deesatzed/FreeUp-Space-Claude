@@ -39,17 +39,39 @@ def main() -> int:
             "# Mac Disk Cleanup Report",
             "## Disk Overview",
             "Time Machine Local Snapshots",
+            "## Top Findings",
+            "| Size | Path | Category | Risk | Recommended Action |",
+            "/Users/test/Library",
+            "/Users/test/Library/Application Support/Google/DriveFS",
+            "## Audit Coverage",
+            "MISSING",
+            "SKIPPED",
             "## Directory Sizes",
             "## Top Caches",
             "## Largest Applications",
             "## Quick Cleanup Commands",
             "npm cache clean --force",
+            "Expected impact",
         ]
 
         missing = [phrase for phrase in required_phrases if phrase not in report]
         if missing:
             print("Report missing expected phrases:", file=sys.stderr)
             for phrase in missing:
+                print(f"- {phrase}", file=sys.stderr)
+            print("\nGenerated report:\n", file=sys.stderr)
+            print(report, file=sys.stderr)
+            return 1
+
+        unexpected_phrases = [
+            "yarn cache clean",
+            "brew cleanup --prune=all",
+            "go clean -cache",
+        ]
+        unexpected = [phrase for phrase in unexpected_phrases if phrase in report]
+        if unexpected:
+            print("Report included non-findings-driven commands:", file=sys.stderr)
+            for phrase in unexpected:
                 print(f"- {phrase}", file=sys.stderr)
             print("\nGenerated report:\n", file=sys.stderr)
             print(report, file=sys.stderr)
