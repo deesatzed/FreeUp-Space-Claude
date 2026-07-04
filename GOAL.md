@@ -8,6 +8,13 @@ This goal is grounded in the current checkout at
 - `AGENTS.md`
 - `README.md`
 - `SKILL.md`
+- `GOAL_AGENT_NATIVE_READINESS.md`
+- `agent_surfaces/skills/freeup-space/SKILL.md`
+- `agent_surfaces/skills/mac-app-audit/SKILL.md`
+- `agent_surfaces/skills/mac-tools-federation/SKILL.md`
+- `agent_surfaces/commands/freeup-space.md`
+- `agent_surfaces/commands/audit-apps.md`
+- `agent_surfaces/commands/mac-tools-federation.md`
 - `scripts/disk_audit.sh`
 - `scripts/generate_report.py`
 - `scripts/freeup_space.py`
@@ -45,9 +52,9 @@ drive the next autonomous run:
 1. `MAC_App_Audit/` currently contains a flat local copy of
    `mac-tools-federation` contract files plus a `GOAL.md` for a planned
    `mac-app-audit v0.2` build.
-2. The folder is not yet the complete `mac-app-audit` implementation root
+2. The folder is not yet the complete `mac-app-audit` skill/command implementation root
    described by `MAC_App_Audit/HANDOFF_v0.1.md`.
-3. The actual app implementation files named by `HANDOFF_v0.1.md` are absent
+3. The actual skill/command implementation files named by `HANDOFF_v0.1.md` are absent
    from `MAC_App_Audit/`: `SKILL.md`, `scripts/collect_inventory.sh`,
    `commands/audit-apps.md`, and `tests/fixtures/mac_apps_report.txt`.
 4. The flat-layout validator command works:
@@ -59,11 +66,10 @@ drive the next autonomous run:
 
    Expected output includes `OK: 5/5 entries valid.`
 
-5. `MAC_App_Audit/test_validator.py` is currently broken because it expects the
-   canonical standalone federation layout:
-   `validator/validate_ledger.py`, `examples/example_ledger.json`, and
-   `tests/fixtures_invalid_ledger.json` under the parent repo root.
-6. The P0 blockers are repo identity/layout and validator smoke-test alignment.
+5. `MAC_App_Audit/test_validator.py` now validates the flat bundle layout and
+   no-site-packages fallback path.
+6. The remaining P0 blocker is repo identity/layout for the full
+   `mac-app-audit` skill/command implementation root.
 7. Parent FreeUp Space is a separate storage-audit product and must not be
    mixed with app-audit implementation logic.
 8. `MAC_App_Audit/` is untracked in the parent git repo at handoff time, and
@@ -71,8 +77,9 @@ drive the next autonomous run:
 
 ## Product North Star
 
-Mac Tools Federation is not a new app. It is the file contract that lets
-independent local Mac tools coordinate decisions safely:
+Mac Tools Federation is not a new app. It is the file contract and agent
+routing layer that lets independent local Mac tools coordinate decisions
+safely:
 
 - FreeUp Space owns disk-space findings: caches, rebuildable artifacts, large
   files, local model bytes, and reclaimable storage.
@@ -84,14 +91,15 @@ independent local Mac tools coordinate decisions safely:
 The product promise is:
 
 > Two independent tools, one safety contract, one ledger language, no hidden
-> cleanup, no cross-product code coupling, and no umbrella runtime until both
-> producers independently work.
+> cleanup, no cross-product code coupling, and no umbrella runtime. Codex or
+> Claude Code is the manager through skills and command markdown; scripts are
+> deterministic helpers.
 
 ## OUTCOME
 
 Complete Mac Tools Federation v0.1 so that both `freeup-space` and
 `mac-app-audit` are represented as independent, validated federation
-participants.
+participants with Codex/Claude-native skill and command surfaces.
 
 The completed v0.1 federation must provide:
 
@@ -105,7 +113,9 @@ The completed v0.1 federation must provide:
 5. Preserved FreeUp Space v0.2 CLI/report behavior.
 6. A safe path for future work that can build `mac-app-audit v0.2` only after
    the implementation-root mismatch is resolved.
-7. No cleanup execution, no app uninstall execution, no `sudo`, no daemon, no
+7. Installable agent surfaces for `freeup-space`, `mac-app-audit`, and
+   `mac-tools-federation`.
+8. No cleanup execution, no app uninstall execution, no `sudo`, no daemon, no
    telemetry, and no umbrella CLI.
 
 ## Required Federation Shape
@@ -150,7 +160,7 @@ Confirm the active facts from `MAC_App_Audit/HANDOFF_2026-07-03.md`:
 
 - `MAC_App_Audit/` is currently flat.
 - The flat validator command works.
-- `test_validator.py` is path-broken.
+- `test_validator.py` validates the flat bundle and fallback path.
 - The mac-app-audit implementation files are absent unless newly found.
 - FreeUp Space and mac-app-audit remain separate products.
 
@@ -232,7 +242,27 @@ It must prove:
 The test must not run live macOS audits, cleanup commands, app installs,
 app uninstalls, package installs, network calls, or live ledger writes.
 
-### Phase 4 - Preserve FreeUp Space v0.2
+### Phase 4 - Add Agent-Native Skill And Command Surfaces
+
+Add or update installable Codex/Claude surfaces so the federation is callable
+through agent-native structures:
+
+```text
+agent_surfaces/skills/freeup-space/SKILL.md
+agent_surfaces/skills/mac-app-audit/SKILL.md
+agent_surfaces/skills/mac-tools-federation/SKILL.md
+agent_surfaces/commands/freeup-space.md
+agent_surfaces/commands/audit-apps.md
+agent_surfaces/commands/mac-tools-federation.md
+scripts/install_agent_surfaces.sh
+tests/test_agent_surfaces.py
+```
+
+The MAC_App_Audit skill/command must be truthful: if the skill/command implementation root is
+still absent, it validates the flat bundle and reports the missing collector
+pipeline instead of pretending a live app-audit workflow exists.
+
+### Phase 5 - Preserve FreeUp Space v0.2
 
 FreeUp Space v0.2 must continue to work after federation edits.
 
@@ -242,10 +272,13 @@ Run and pass:
 bash -n scripts/disk_audit.sh
 bash -n install.sh
 bash -n uninstall.sh
+bash -n scripts/install_agent_surfaces.sh
 python3 -m py_compile scripts/generate_report.py
 python3 -m py_compile scripts/freeup_space.py
 python3 tests/smoke_test.py
 python3 tests/test_cli_smoke.py
+python3 tests/test_public_readiness.py
+python3 tests/test_agent_surfaces.py
 python3 scripts/freeup_space.py --help
 python3 scripts/freeup_space.py doctor
 python3 scripts/freeup_space.py report --input tests/fixtures/sample_audit.txt --output /tmp/freeup-space-report.md
@@ -255,12 +288,12 @@ Do not require a live disk audit for federation completion unless explicitly
 running an optional macOS-only manual smoke test. Any live audit remains
 read-only.
 
-### Phase 5 - Prepare The Next mac-app-audit Build, But Do Not Fake It
+### Phase 6 - Prepare The Next mac-app-audit Build, But Do Not Fake It
 
 After the federation contract is normalized, update `MAC_App_Audit/GOAL.md`
 only if needed so it clearly says whether:
 
-1. `MAC_App_Audit/` is now the actual app implementation root, or
+1. `MAC_App_Audit/` is now the actual skill/command implementation root, or
 2. `MAC_App_Audit/` is a federation contract bundle and the app implementation
    root still needs to be located or created.
 
@@ -282,10 +315,13 @@ Run the FreeUp Space validation:
 bash -n scripts/disk_audit.sh
 bash -n install.sh
 bash -n uninstall.sh
+bash -n scripts/install_agent_surfaces.sh
 python3 -m py_compile scripts/generate_report.py
 python3 -m py_compile scripts/freeup_space.py
 python3 tests/smoke_test.py
 python3 tests/test_cli_smoke.py
+python3 tests/test_public_readiness.py
+python3 tests/test_agent_surfaces.py
 python3 scripts/freeup_space.py --help
 python3 scripts/freeup_space.py doctor
 python3 scripts/freeup_space.py report --input tests/fixtures/sample_audit.txt --output /tmp/freeup-space-report.md
@@ -306,17 +342,33 @@ Run the root federation smoke test:
 python3 tests/test_federation_contract.py
 ```
 
+Install and verify the agent surfaces:
+
+```bash
+bash scripts/install_agent_surfaces.sh
+test -f "$HOME/.codex/skills/freeup-space/SKILL.md"
+test -f "$HOME/.codex/skills/mac-app-audit/SKILL.md"
+test -f "$HOME/.codex/skills/mac-tools-federation/SKILL.md"
+test -f "$HOME/.agents/skills/freeup-space/SKILL.md"
+test -f "$HOME/.claude/skills/freeup-space/SKILL.md"
+test -f "$HOME/.claude/commands/mac-tools/freeup-space.md"
+test -f "$HOME/.claude/commands/mac-tools/audit-apps.md"
+test -f "$HOME/.claude/commands/mac-tools/mac-tools-federation.md"
+```
+
 Also verify by file inspection:
 
 1. `GOAL.md` names `MAC_App_Audit/HANDOFF_2026-07-03.md` as source evidence.
 2. `FEDERATION.md` exists and names both producers and their boundaries.
 3. The example ledger includes both `mac-app-audit` and `freeup-space`.
 4. At least one cross-producer `related_entries` seam exists.
-5. No source path added in this run executes cleanup, app uninstall, package
+5. Agent surfaces state that Codex/Claude is the manager and scripts are
+   deterministic helpers.
+6. No source path added in this run executes cleanup, app uninstall, package
    install, `sudo`, daemon setup, telemetry, or live ledger mutation by default.
-6. No `__pycache__`, temporary ledgers, generated reports, or local-only test
+7. No `__pycache__`, temporary ledgers, generated reports, or local-only test
    outputs remain in the repo tree.
-7. `git diff --stat` shows only scoped federation/doc/test changes plus any
+8. `git diff --stat` shows only scoped federation/doc/test changes plus any
    pre-existing FreeUp v0.2 changes that were already in the worktree.
 
 ## SCOPE
@@ -324,10 +376,14 @@ Also verify by file inspection:
 Allowed to modify:
 
 - `GOAL.md`
+- `GOAL_AGENT_NATIVE_READINESS.md`
 - `FEDERATION.md`
 - `README.md`
 - `AGENTS.md`
+- `agent_surfaces/`
+- `scripts/install_agent_surfaces.sh`
 - `tests/test_federation_contract.py`
+- `tests/test_agent_surfaces.py`
 - `MAC_App_Audit/GOAL.md`
 - `MAC_App_Audit/README.md`
 - `MAC_App_Audit/CONVENTIONS.md`
@@ -384,6 +440,8 @@ Do not modify:
     dependency is already required.
 11. Keep macOS-specific checks graceful on Linux CI.
 12. Do not remove or weaken tests to make the goal pass.
+13. Do not present the helper CLI as the primary product surface; Codex/Claude
+    skills and commands are the intended manager layer.
 
 ## SAFETY / PROVENANCE
 
@@ -410,18 +468,20 @@ Do not modify:
 3. Fix the smallest hard blocker first: `MAC_App_Audit/test_validator.py` path
    and fixture assumptions.
 4. Add or update federation docs only after the chosen layout is clear.
-5. Add root smoke coverage after docs and validator behavior agree.
-6. Re-run the nearest relevant verification after each batch.
-7. Keep a concise progress record in the final summary unless `PROGRESS.md`
+5. Add or update agent surfaces after docs and validator behavior agree.
+6. Add root smoke coverage after docs, validator behavior, and agent surfaces
+   agree.
+7. Re-run the nearest relevant verification after each batch.
+8. Keep a concise progress record in the final summary unless `PROGRESS.md`
    exists and is already used by this repo.
-8. Preserve all unrelated dirty work.
+9. Preserve all unrelated dirty work.
 
 ## STOP
 
 Pause and summarize before continuing if:
 
-1. `MAC_App_Audit/` cannot be classified as either a contract bundle or app
-   implementation root after inspection.
+1. `MAC_App_Audit/` cannot be classified as either a contract bundle or
+   skill/command implementation root after inspection.
 2. The federation validator cannot validate the bundled example ledger using
    either `jsonschema` or the standard-library fallback.
 3. The same failure persists after three distinct repair attempts.
@@ -442,10 +502,11 @@ Mark this goal complete only when:
 3. The `MAC_App_Audit` validator suite passes in the current layout.
 4. The root federation smoke test passes.
 5. FreeUp Space v0.2 validation still passes.
-6. Safety contracts remain intact and no cleanup execution is introduced.
-7. The implementation-root truth for mac-app-audit is explicitly documented.
-8. `git diff --check` is clean.
-9. Generated caches and local-only artifacts are absent from the repo tree.
-10. The final summary separates verified behavior from deferred future work.
+6. Agent surface installation is verified for Codex and Claude paths.
+7. Safety contracts remain intact and no cleanup execution is introduced.
+8. The implementation-root truth for mac-app-audit is explicitly documented.
+9. `git diff --check` is clean.
+10. Generated caches and local-only artifacts are absent from the repo tree.
+11. The final summary separates verified behavior from deferred future work.
 
 Do not push unless the user explicitly asks.

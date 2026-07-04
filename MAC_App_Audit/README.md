@@ -15,6 +15,11 @@ Canonical federation paths may use `schema/`, `validator/`, `examples/`, and
 `tests/`, but this checked-in bundle currently validates with the flat paths
 shown below.
 
+Agent-surface note: the parent repo now includes a manager skill and command
+for this bundle under `agent_surfaces/skills/mac-app-audit/SKILL.md` and
+`agent_surfaces/commands/audit-apps.md`. Those surfaces are truthful routers;
+they do not claim the missing collector/writer pipeline exists yet.
+
 | File | Purpose |
 |---|---|
 | `ledger-entry.schema.json` | The versioned JSON Schema every ledger entry must satisfy. |

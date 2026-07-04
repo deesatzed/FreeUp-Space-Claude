@@ -1,4 +1,9 @@
-# GOAL_Public_READINESS.md - FreeUp Space Public Readiness Contract
+# GOAL_Public_READINESS.md - Historical CLI Hardening Contract
+
+> Correction, 2026-07-04: this file is retained as evidence for CLI/report
+> hardening. It is not the current product-readiness contract. The current
+> readiness goal is `GOAL_AGENT_NATIVE_READINESS.md`, where Codex or Claude
+> Code is the manager and skills/commands are the primary invocation surfaces.
 
 Use this file from the repository root with:
 

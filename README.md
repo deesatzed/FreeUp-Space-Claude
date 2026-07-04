@@ -1,14 +1,26 @@
-# FreeUp Space - Mac Storage Assistant
+# FreeUp Space - Agent-Native Mac Storage Assistant
 
-A Claude/Codex-friendly macOS storage assistant that performs read-only disk analysis, identifies reclaimable space, and provides prioritized cleanup recommendations. It never deletes, moves, clears caches, thins snapshots, or runs `sudo` in v0.2.
+FreeUp Space is a Claude Code/Codex-native macOS storage assistant. Codex or
+Claude Code is the manager: it asks the questions, runs deterministic read-only
+helper scripts, interprets the report, and keeps approval boundaries visible.
+It never deletes, moves, clears caches, thins snapshots, or runs `sudo` in v0.2.
+
+This repo also carries the MAC_App_Audit federation bundle and installable
+agent surfaces for routing app/tool-choice work. The intended product surface is
+skills and command markdown, not a standalone cleanup app.
 
 ## What It Does
 
-- **Full disk audit**: APFS volumes, Time Machine snapshots, app caches, dev tool caches, cloud sync overhead
-- **Smart questioning**: Asks about your setup (external drives, use case, comfort level) before diving in
-- **Prioritized recommendations**: Grouped into safety tiers — lower-risk caches, movable data, and items requiring judgment
-- **Markdown report**: Generates a saved report with ranked findings and manual action suggestions
-- **Always asks first**: Never runs cleanup commands or command suggestions without explicit approval
+- **Agent-managed audit flow**: Codex/Claude uses skills and commands to run
+  read-only helpers and explain findings.
+- **Full disk audit**: APFS volumes, Time Machine snapshots, app caches, dev
+  tool caches, cloud sync overhead.
+- **Prioritized recommendations**: grouped into safety tiers: lower-risk
+  caches, movable data, and items requiring judgment.
+- **Markdown report**: saved report with ranked findings and manual action
+  suggestions.
+- **Always asks first**: never runs cleanup commands or command suggestions
+  without explicit approval.
 
 ## Typical Space Recovery
 
@@ -19,7 +31,57 @@ On a developer's Mac, this skill typically identifies **50-150 GB** of reclaimab
 - Build artifacts such as Rust `target/` folders and dormant `node_modules`
 - Cloud sync metadata from Google Drive, iCloud, Dropbox, or similar tools
 
-## Quickstart
+## Agent-Native Quickstart
+
+Install the Codex/Claude skill and command surfaces:
+
+```bash
+bash scripts/install_agent_surfaces.sh
+```
+
+This installs:
+
+```text
+~/.codex/skills/freeup-space/SKILL.md
+~/.codex/skills/mac-app-audit/SKILL.md
+~/.codex/skills/mac-tools-federation/SKILL.md
+~/.agents/skills/freeup-space/SKILL.md
+~/.agents/skills/mac-app-audit/SKILL.md
+~/.agents/skills/mac-tools-federation/SKILL.md
+~/.claude/skills/freeup-space/SKILL.md
+~/.claude/skills/mac-app-audit/SKILL.md
+~/.claude/skills/mac-tools-federation/SKILL.md
+~/.claude/commands/mac-tools/freeup-space.md
+~/.claude/commands/mac-tools/audit-apps.md
+~/.claude/commands/mac-tools/mac-tools-federation.md
+```
+
+Then invoke it from Codex or Claude Code, for example:
+
+```text
+Use the freeup-space skill. Run a read-only storage audit, generate a report,
+and summarize findings. Do not execute cleanup commands.
+```
+
+For federation routing:
+
+```text
+Use the mac-tools-federation skill. Tell me whether this finding belongs to
+FreeUp Space or MAC_App_Audit, then validate the ledger seam.
+```
+
+For MAC_App_Audit:
+
+```text
+Use the mac-app-audit skill. Preflight whether the real skill/command implementation root is
+present. If only the flat federation bundle is present, validate it and report
+the missing collector/command files.
+```
+
+## Deterministic Helper CLI
+
+The helper CLI exists for repeatability, tests, and direct local execution. It
+is not the primary product identity.
 
 Install the local wrapper:
 
@@ -127,13 +189,15 @@ package installation for federation validation.
 
 ## Use With Codex
 
-This repository is now structured so Codex can understand, test, and safely modify it.
+This repository is structured so Codex can understand, test, install, and safely
+modify the agent-native surfaces.
 
 Start with:
 
 ```bash
 cat AGENTS.md
 cat GOAL.md
+cat GOAL_AGENT_NATIVE_READINESS.md
 ```
 
 Then ask Codex to work from one of the task packs in `codex/tasks.md`, for example:
@@ -148,19 +212,22 @@ Recommended validation commands:
 bash -n scripts/disk_audit.sh
 bash -n install.sh
 bash -n uninstall.sh
+bash -n scripts/install_agent_surfaces.sh
 python3 -m py_compile scripts/generate_report.py
 python3 -m py_compile scripts/freeup_space.py
 python3 tests/smoke_test.py
 python3 tests/test_cli_smoke.py
 python3 tests/test_public_readiness.py
+python3 tests/test_agent_surfaces.py
 python3 tests/test_federation_contract.py
 ```
 
-## Installation
+## Helper Installation
 
-### One-Command CLI
+### Local Wrapper
 
-Use the repo-local installer:
+Use the repo-local wrapper installer only if you want direct shell access to
+the deterministic helper:
 
 ```bash
 bash install.sh
@@ -168,11 +235,20 @@ freeup-space doctor
 freeup-space
 ```
 
-The installer writes one wrapper at `~/.local/bin/freeup-space`. It does not use `sudo`, run an audit, or clean anything.
+The installer writes one wrapper at `~/.local/bin/freeup-space`. It does not
+use `sudo`, run an audit, or clean anything.
 
-### As a Claude Skill
+### Agent Surfaces
 
-Download `disk-cleanup.skill` from [Releases](../../releases) and install it in Claude Desktop / Cowork, or copy the skill folder into your Claude skills directory.
+Run:
+
+```bash
+bash scripts/install_agent_surfaces.sh
+```
+
+This copies repo-local skill and command markdown into Codex/Claude user
+directories. It does not run an audit, install packages, clean anything, or
+write live ledgers.
 
 ### Manual Use
 
@@ -193,9 +269,11 @@ The audit script is read-only. It reports disk usage; it does not delete, move, 
 
 ```text
 ├── AGENTS.md                          # Codex operating instructions and safety contract
+├── GOAL_AGENT_NATIVE_READINESS.md      # Current skill/command readiness contract
 ├── FEDERATION.md                      # File-based federation contract for FreeUp and mac-app-audit
 ├── GOAL.md                            # Build goal and handoff brief
 ├── SKILL.md                           # Claude skill instructions
+├── agent_surfaces/                    # Installable Codex/Claude skills and commands
 ├── install.sh                         # No-sudo installer for ~/.local/bin/freeup-space
 ├── uninstall.sh                       # Removes only the installed wrapper
 ├── MAC_App_Audit/                     # Flat federation contract bundle and planned app-audit goal

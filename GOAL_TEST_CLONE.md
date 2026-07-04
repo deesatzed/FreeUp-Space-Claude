@@ -18,14 +18,17 @@ Then run:
 ## OUTCOME
 
 Complete a fresh-clone verification session proving that the GitHub checkout of
-FreeUp Space contains a working safety-first CLI, a valid local Mac Tools
-Federation contract, and a working `MAC_App_Audit` flat contract bundle.
+FreeUp Space contains Codex/Claude-native skill and command surfaces, a working
+safety-first helper CLI, a valid local Mac Tools Federation contract, and a
+working `MAC_App_Audit` flat contract bundle.
 
 The test session must prove all three surfaces from a newly cloned checkout:
 
 1. FreeUp Space v0.2 CLI/report functionality.
 2. Mac Tools Federation file contract and cross-producer ledger seam.
 3. `MAC_App_Audit` validator/schema/example-ledger bundle.
+4. Codex/Claude skills and command markdown for `freeup-space`,
+   `mac-app-audit`, and `mac-tools-federation`.
 
 This goal is a verification goal, not an implementation goal. Do not add
 features unless a small test harness repair is required to make a documented
@@ -52,6 +55,8 @@ Confirm:
 - The checkout contains `AGENTS.md`, `GOAL.md`, `GOAL_TEST_CLONE.md`,
   `FEDERATION.md`, `README.md`, `install.sh`, `uninstall.sh`,
   `scripts/freeup_space.py`, and `MAC_App_Audit/`.
+- The checkout contains `GOAL_AGENT_NATIVE_READINESS.md` and
+  `agent_surfaces/`.
 
 ### 2. Documentation And Boundary Inspection
 
@@ -144,7 +149,33 @@ Confirm:
 - Validation works even when `jsonschema` is not installed, using the bundled
   standard-library fallback. Do not install packages during this proof.
 
-### 6. Federation Smoke And Ledger Seam Validation
+### 6. Agent Surface Validation
+
+```bash
+bash -n scripts/install_agent_surfaces.sh
+python3 tests/test_agent_surfaces.py
+TMP_HOME="$(mktemp -d)"
+HOME="$TMP_HOME" bash scripts/install_agent_surfaces.sh
+test -f "$TMP_HOME/.codex/skills/freeup-space/SKILL.md"
+test -f "$TMP_HOME/.codex/skills/mac-app-audit/SKILL.md"
+test -f "$TMP_HOME/.codex/skills/mac-tools-federation/SKILL.md"
+test -f "$TMP_HOME/.agents/skills/freeup-space/SKILL.md"
+test -f "$TMP_HOME/.claude/skills/freeup-space/SKILL.md"
+test -f "$TMP_HOME/.claude/commands/mac-tools/freeup-space.md"
+test -f "$TMP_HOME/.claude/commands/mac-tools/audit-apps.md"
+test -f "$TMP_HOME/.claude/commands/mac-tools/mac-tools-federation.md"
+rm -rf "$TMP_HOME"
+```
+
+Confirm:
+
+- The installed surfaces are skill/command markdown only.
+- The installer runs without package installs, audits, cleanup, sudo, or live
+  ledger writes.
+- `mac-app-audit` surfaces truthfully report that the flat bundle is not the
+  full collector implementation root.
+
+### 7. Federation Smoke And Ledger Seam Validation
 
 ```bash
 python3 tests/test_federation_contract.py
@@ -175,7 +206,7 @@ Confirm:
 - Producers include both `freeup-space` and `mac-app-audit`.
 - At least one cross-producer seam exists.
 
-### 7. Optional macOS-Only Live Read-Only Audit
+### 8. Optional macOS-Only Live Read-Only Audit
 
 Run this only on macOS and only if a live audit is acceptable for the session.
 It is read-only but can take time on large home directories:
@@ -188,11 +219,11 @@ test -s /tmp/freeup-space-clone-live-report.md
 
 Do not run any cleanup command suggested by the generated report.
 
-### 8. Final Artifact And Safety Checks
+### 9. Final Artifact And Safety Checks
 
 ```bash
 find . \( -name __pycache__ -o -name '*.pyc' -o -name '*test.ledger.json' -o -name '*freeup-space-clone-*.md' -o -name '*freeup-space-clone-*.txt' \) -print
-rg -n "sudo|rm -rf|trash|brew uninstall|pip install|launchd|daemon|telemetry|live ledger|cleanup command|app uninstall" FEDERATION.md AGENTS.md README.md scripts tests MAC_App_Audit
+rg -n "sudo|rm -rf|trash|brew uninstall|pip install|launchd|daemon|telemetry|live ledger|cleanup command|app uninstall" FEDERATION.md AGENTS.md README.md agent_surfaces scripts tests MAC_App_Audit
 git status --short --branch
 ```
 
@@ -211,6 +242,7 @@ Allowed:
 - Read and inspect repository files.
 - Run fixture-based tests and validators.
 - Run FreeUp CLI help, doctor, and fixture report commands.
+- Run agent-surface validation and sandboxed skill/command installation.
 - Run installer/uninstaller only with a temporary HOME.
 - Run optional live read-only audit on macOS only if acceptable.
 - If a verification command fails because of a repo bug, make the smallest

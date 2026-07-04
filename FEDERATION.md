@@ -12,8 +12,8 @@ server, umbrella CLI, package manager, installer, or cleanup executor.
 
 | Producer | Current path | Owns | Current status |
 |---|---|---|---|
-| `freeup-space` | `/Users/o2satz/FreeUp-Space-Claude` | Disk-space findings, cache bloat, rebuildable artifacts, large files, model bytes, and reclaimable storage recommendations | Working v0.2 CLI/report path; no default live ledger writer in this federation goal |
-| `mac-app-audit` | `/Users/o2satz/FreeUp-Space-Claude/MAC_App_Audit` | App/tool-choice findings, Homebrew package keep/remove recommendations, redundant tools, superseded tools, keep decisions, and alternatives review | Current directory is a flat federation contract bundle plus a planned v0.2 goal; implementation root still must be located or created before app-audit v0.2 work starts |
+| `freeup-space` | `/Users/o2satz/FreeUp-Space-Claude` | Disk-space findings, cache bloat, rebuildable artifacts, large files, model bytes, and reclaimable storage recommendations | Codex/Claude skill and command surfaces plus working v0.2 helper CLI/report path; no default live ledger writer in this federation goal |
+| `mac-app-audit` | `/Users/o2satz/FreeUp-Space-Claude/MAC_App_Audit` | App/tool-choice findings, Homebrew package keep/remove recommendations, redundant tools, superseded tools, keep decisions, and alternatives review | Current directory is a flat federation contract bundle plus an installable manager skill/command; full skill/command implementation root still must be located or created before app-audit v0.2 work starts |
 
 ## Boundary
 
@@ -86,6 +86,13 @@ Root federation smoke:
 
 ```bash
 python3 tests/test_federation_contract.py
+```
+
+Agent-native surfaces:
+
+```bash
+bash scripts/install_agent_surfaces.sh
+python3 tests/test_agent_surfaces.py
 ```
 
 ## Safety Floor

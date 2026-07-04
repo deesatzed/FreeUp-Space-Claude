@@ -2,7 +2,11 @@
 
 ## Project Role
 
-This repository contains a macOS disk cleanup skill and standalone audit/reporting scripts. The assistant should act as a cautious macOS storage analyst, not as an aggressive cleanup bot.
+This repository contains Codex/Claude-native macOS storage and app-audit
+surfaces. The primary product surface is skills and command markdown managed by
+Codex or Claude Code. Bash/Python CLIs are deterministic read-only helper
+scripts for audit, reporting, tests, and repeatability; do not treat them as a
+standalone cleanup app.
 
 The product promise is simple: **find reclaimable space, explain it clearly, and never delete anything without explicit approval.**
 
@@ -24,7 +28,9 @@ These rules are mandatory for all future Codex work in this repository:
 - `SKILL.md`: Claude skill instructions and behavioral workflow.
 - `README.md`: human-facing overview and installation/use instructions.
 - `GOAL.md`: project goal and implementation handoff.
+- `GOAL_AGENT_NATIVE_READINESS.md`: current Codex/Claude-native readiness goal.
 - `FEDERATION.md`: file-based federation contract between FreeUp Space and mac-app-audit.
+- `agent_surfaces/`: installable Codex/Claude skill and command surfaces.
 - `install.sh`: no-sudo installer for the `freeup-space` wrapper.
 - `uninstall.sh`: removes only the installed wrapper.
 - `MAC_App_Audit/`: flat federation contract bundle and planned mac-app-audit goal.
@@ -46,11 +52,13 @@ Run these before summarizing changes when editing scripts, docs that mention com
 bash -n scripts/disk_audit.sh
 bash -n install.sh
 bash -n uninstall.sh
+bash -n scripts/install_agent_surfaces.sh
 python3 -m py_compile scripts/generate_report.py
 python3 -m py_compile scripts/freeup_space.py
 python3 tests/smoke_test.py
 python3 tests/test_cli_smoke.py
 python3 tests/test_public_readiness.py
+python3 tests/test_agent_surfaces.py
 python3 tests/test_federation_contract.py
 ```
 
@@ -109,4 +117,8 @@ Do not run cleanup commands during validation.
 
 ## Desired Future Direction
 
-The highest-value future improvement is to convert the loose text audit into structured JSON while preserving a readable text fallback. That would let reports rank findings more accurately, power UI output, and reduce fragile parsing.
+The highest-value future improvement is to keep the agent-native surface honest:
+Codex/Claude skills and commands should route the work, while deterministic
+helpers produce structured data. Converting the loose text audit into
+structured JSON remains valuable because it would make agent summaries and
+reports less parser-fragile.

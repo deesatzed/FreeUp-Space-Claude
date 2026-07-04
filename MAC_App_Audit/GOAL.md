@@ -18,16 +18,16 @@ Source evidence read while shaping this goal:
 
 Task type: multi-phase build with safety/provenance constraints.
 
-Raw objective: convert `mac-app-audit` from a working skill prototype into a ledger-native, periodically run Mac software audit tool that keeps the audit path read-only, computes deterministic usage signals, writes federation-valid ledger entries, and supports a short weekly delta mode.
+Raw objective: convert `mac-app-audit` from a working skill prototype into a ledger-native, periodically run Codex/Claude-managed Mac software audit workflow that keeps the audit path read-only, computes deterministic usage signals, writes federation-valid ledger entries, and supports a short weekly delta mode.
 
-Important repo-placement note: the handoff describes an implementation repo containing `SKILL.md`, `scripts/collect_inventory.sh`, `commands/audit-apps.md`, and sample inventory fixtures. If those files are absent in the active working directory, do not treat federation contract files as a substitute implementation target. Locate the actual `mac-app-audit` implementation root or stop with a concise mismatch report before editing.
+Important repo-placement note: the handoff describes a skill/command implementation root containing `SKILL.md`, `scripts/collect_inventory.sh`, `commands/audit-apps.md`, and sample inventory fixtures. If those files are absent in the active working directory, do not treat federation contract files as a substitute implementation target. Locate the actual `mac-app-audit` skill/command root or stop with a concise mismatch report before editing.
 
 Workspace/federation note observed on 2026-07-03: this directory currently lives at `/Users/o2satz/FreeUp-Space-Claude/MAC_App_Audit`, inside the active FreeUp Space checkout. The parent `/Users/o2satz/FreeUp-Space-Claude` project is itself being completed as FreeUp Space v0.2 and is intended to become a separate producer in the same final file-based federation. Treat that parent project as live sibling-product context, not as mac-app-audit implementation code. The two tools may coordinate only through the shared federation contract and future ledger `related_entries`; do not copy, merge, or fork FreeUp Space cleanup logic into mac-app-audit.
 
 ```text
 /goal
 OUTCOME:
-Build mac-app-audit v0.2 - Ledger-Native Collector + Deterministic Scoring + Delta Mode - so that the actual mac-app-audit implementation repo can:
+Build mac-app-audit v0.2 - Ledger-Native Collector + Deterministic Scoring + Delta Mode - so that the actual mac-app-audit skill/command implementation can:
 1. collect deterministic usage signals for apps and Homebrew tools,
 2. derive CLI invocation counts from retroactive local shell-history reads,
 3. compute Homebrew dependency leaf/dependent signals,
@@ -37,7 +37,7 @@ Build mac-app-audit v0.2 - Ledger-Native Collector + Deterministic Scoring + Del
 7. prove the pipeline with fixture-based tests that do not require a live Mac or execute cleanup actions.
 
 PROOF OF DONE:
-1. Preflight confirms the active implementation root contains `SKILL.md`, `README.md`, `scripts/collect_inventory.sh`, and `commands/audit-apps.md`, and that the federation contract is available either as a sibling repo at `../mac-tools-federation/` or as an explicitly documented local contract bundle containing `SAFETY_CONTRACT.md`, `CONVENTIONS.md`, `ledger-entry.schema.json`, and `validate_ledger.py`. If the implementation root is absent, stop before implementation and report the mismatch instead of building inside the parent FreeUp Space app.
+1. Preflight confirms the active skill/command implementation root contains `SKILL.md`, `README.md`, `scripts/collect_inventory.sh`, and `commands/audit-apps.md`, and that the federation contract is available either as a sibling repo at `../mac-tools-federation/` or as an explicitly documented local contract bundle containing `SAFETY_CONTRACT.md`, `CONVENTIONS.md`, `ledger-entry.schema.json`, and `validate_ledger.py`. If the implementation root is absent, stop before implementation and report the mismatch instead of building inside the parent FreeUp Space helper CLI.
 2. Preflight records the observed FreeUp Space relationship: `/Users/o2satz/FreeUp-Space-Claude` is an active, dirty, separately scoped storage-audit product that will later join the same federation. Confirm mac-app-audit changes do not modify FreeUp Space files except by separately authorized task scope.
 3. Run initial validation before editing and record the result:
    - `bash -n scripts/collect_inventory.sh`
@@ -154,6 +154,6 @@ Mark complete only when every PROOF OF DONE item has passed using actual command
 Assumptions:
 
 - `HANDOFF_v0.1.md` is the authoritative v0.2 implementation brief.
-- The current directory may not be the final implementation root; the goal therefore makes repo-root reconciliation the first proof gate.
+- The current directory may not be the final skill/command implementation root; the goal therefore makes repo-root reconciliation the first proof gate.
 - `/Users/o2satz/FreeUp-Space-Claude` is an active FreeUp Space project and future federation participant; treat it as read-only context for mac-app-audit unless separately authorized.
 - The federation contract remains read-only input for this goal.
