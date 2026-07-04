@@ -121,6 +121,10 @@ cd ..
 python3 tests/test_federation_contract.py
 ```
 
+The bundled validator uses `jsonschema` when available and otherwise falls
+back to standard-library checks for this schema, so a fresh clone does not need
+package installation for federation validation.
+
 ## Use With Codex
 
 This repository is now structured so Codex can understand, test, and safely modify it.

@@ -141,9 +141,8 @@ Confirm:
 - The default-schema validation also works in the flat bundle layout.
 - `test_validator.py` accepts the good ledger, rejects an intentionally invalid
   ledger, and reports a missing file as an environment error.
-
-If `jsonschema` is missing, stop and report the dependency. Do not install
-packages without explicit user approval.
+- Validation works even when `jsonschema` is not installed, using the bundled
+  standard-library fallback. Do not install packages during this proof.
 
 ### 6. Federation Smoke And Ledger Seam Validation
 
@@ -276,7 +275,6 @@ Stop and summarize if:
 
 - The clone is not from `https://github.com/deesatzed/FreeUp-Space-Claude.git`.
 - Required files are missing from the cloned checkout.
-- `jsonschema` is missing and validation cannot proceed without installing it.
 - A command would touch real user install paths, user data, or live ledgers.
 - Any requested path would execute cleanup, app uninstall, package install,
   `sudo`, telemetry, daemon setup, or live ledger mutation.

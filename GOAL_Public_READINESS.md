@@ -53,7 +53,8 @@ Observed working surfaces:
 6. The no-argument workflow runs the default audit/report path and writes to
    Desktop.
 7. The installer/uninstaller work under a temporary `HOME`.
-8. The federation validator and smoke test pass when `jsonschema` is available.
+8. The federation validator and smoke test pass, including in a fresh clone
+   without `jsonschema`.
 
 Observed public-readiness issues:
 
@@ -452,8 +453,8 @@ Stop and summarize if:
   mitigation attempts.
 - The implementation requires modifying user data outside generated audit/report
   outputs.
-- `jsonschema` is missing for federation validation and cannot be used without
-  installing packages.
+- The federation validator cannot validate the bundled example ledger using
+  either `jsonschema` or the standard-library fallback.
 - The same test failure persists after three distinct repair attempts.
 - The work would require a broader app-audit implementation or a shared umbrella
   runtime.

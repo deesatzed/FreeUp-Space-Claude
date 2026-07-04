@@ -37,6 +37,14 @@ def run_validator_with_default_schema(ledger_path: Path) -> subprocess.Completed
     )
 
 
+def run_validator_without_site_packages(ledger_path: Path) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, "-S", str(VALIDATOR), str(ledger_path), "--schema", str(SCHEMA)],
+        capture_output=True,
+        text=True,
+    )
+
+
 def check(condition: bool, description: str, failures: list[str]) -> None:
     status = "PASS" if condition else "FAIL"
     print(f"[{status}] {description}")
@@ -67,6 +75,18 @@ def main() -> None:
     check(
         default_schema_result.returncode == 0,
         f"validator finds the flat-bundle schema by default (got {default_schema_result.returncode})",
+        failures,
+    )
+
+    fallback_result = run_validator_without_site_packages(GOOD_LEDGER)
+    check(
+        fallback_result.returncode == 0,
+        f"validator has a no-site-packages fallback for the good ledger (got {fallback_result.returncode})",
+        failures,
+    )
+    check(
+        "OK:" in fallback_result.stdout,
+        "fallback validator prints an OK summary line for the good ledger",
         failures,
     )
 

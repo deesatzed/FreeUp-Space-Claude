@@ -377,9 +377,9 @@ Do not modify:
 6. Do not add an umbrella CLI or suite dispatcher.
 7. Do not merge FreeUp Space and mac-app-audit implementation logic.
 8. Do not write live ledger files during tests.
-9. Do not add dependencies unless required for the existing validator path and
-   documented. If `jsonschema` is missing, stop and report the dependency
-   rather than installing packages without approval.
+9. Do not add dependencies unless required and documented. The federation
+   validator must run in a fresh clone using its standard-library fallback when
+   `jsonschema` is unavailable.
 10. Use the Python standard library for new tests unless an existing validator
     dependency is already required.
 11. Keep macOS-specific checks graceful on Linux CI.
@@ -422,8 +422,8 @@ Pause and summarize before continuing if:
 
 1. `MAC_App_Audit/` cannot be classified as either a contract bundle or app
    implementation root after inspection.
-2. `jsonschema` or another existing validator dependency is unavailable and
-   validation cannot run without installing packages.
+2. The federation validator cannot validate the bundled example ledger using
+   either `jsonschema` or the standard-library fallback.
 3. The same failure persists after three distinct repair attempts.
 4. The implementation would require cleanup execution, app uninstall execution,
    `sudo`, live ledger mutation, package installation, telemetry, daemon setup,

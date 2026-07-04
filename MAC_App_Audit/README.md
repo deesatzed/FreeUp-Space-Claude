@@ -65,8 +65,10 @@ python3 validate_ledger.py example_ledger.json --schema ledger-entry.schema.json
 python3 test_validator.py
 ```
 
-The validator requires the `jsonschema` Python package. Do not install it
-automatically from tests or helper scripts.
+The validator uses the `jsonschema` Python package when it is available. In a
+fresh clone without extra packages, it falls back to a standard-library
+validator for the bundled schema subset. Tests and helper scripts must not
+install packages automatically.
 
 ## Versioning philosophy
 
