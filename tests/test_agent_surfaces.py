@@ -70,6 +70,8 @@ def main() -> int:
             print(result.stdout)
             print(result.stderr, file=sys.stderr)
             return result.returncode
+        if "reload the client" not in result.stdout:
+            return fail("Installer output does not mention reload/new-session discovery")
 
         for base in [".codex/skills", ".agents/skills", ".claude/skills"]:
             for skill in SKILLS:

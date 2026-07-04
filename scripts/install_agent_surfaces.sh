@@ -51,3 +51,4 @@ for command_file in "$SURFACES_DIR"/commands/*.md; do
 done
 
 printf 'Agent surfaces installed. No cleanup commands were executed.\n'
+printf 'Start a new Codex or Claude Code session, or reload the client, if the current session does not show newly installed skills or commands.\n'

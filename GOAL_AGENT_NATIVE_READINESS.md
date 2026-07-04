@@ -78,7 +78,13 @@ test -f "$HOME/.claude/skills/freeup-space/SKILL.md"
 test -f "$HOME/.claude/commands/mac-tools/freeup-space.md"
 test -f "$HOME/.claude/commands/mac-tools/audit-apps.md"
 test -f "$HOME/.claude/commands/mac-tools/mac-tools-federation.md"
+test -f "$HOME/.codex/prompts/mac-tools/freeup-space.md"
+test -f "$HOME/.codex/prompts/mac-tools/audit-apps.md"
+test -f "$HOME/.codex/prompts/mac-tools/mac-tools-federation.md"
 ```
+
+Then start a new Codex or Claude Code session, or reload the client, so newly
+installed skills and commands are discovered by the agent runtime.
 
 Optional live macOS proof for FreeUp Space:
 

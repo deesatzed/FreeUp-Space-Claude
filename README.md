@@ -54,7 +54,15 @@ This installs:
 ~/.claude/commands/mac-tools/freeup-space.md
 ~/.claude/commands/mac-tools/audit-apps.md
 ~/.claude/commands/mac-tools/mac-tools-federation.md
+~/.codex/prompts/mac-tools/freeup-space.md
+~/.codex/prompts/mac-tools/audit-apps.md
+~/.codex/prompts/mac-tools/mac-tools-federation.md
 ```
+
+After installing, start a new Codex or Claude Code session, or reload the
+client, so newly copied skills and commands are discovered. The files are
+written immediately, but a running session may not refresh its skill list
+dynamically.
 
 Then invoke it from Codex or Claude Code, for example:
 
