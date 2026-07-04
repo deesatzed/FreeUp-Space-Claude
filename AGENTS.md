@@ -50,6 +50,7 @@ python3 -m py_compile scripts/generate_report.py
 python3 -m py_compile scripts/freeup_space.py
 python3 tests/smoke_test.py
 python3 tests/test_cli_smoke.py
+python3 tests/test_public_readiness.py
 python3 tests/test_federation_contract.py
 ```
 
@@ -68,6 +69,7 @@ When editing the v0.2 CLI surface, also smoke these direct commands:
 ```bash
 python3 scripts/freeup_space.py --help
 python3 scripts/freeup_space.py doctor
+python3 scripts/freeup_space.py --audit-output /tmp/freeup-space-audit.txt --report-output /tmp/freeup-space-report.md --no-open --non-interactive
 python3 scripts/freeup_space.py report --input tests/fixtures/sample_audit.txt --output /tmp/freeup-space-report.md
 ```
 
@@ -76,7 +78,7 @@ On macOS only, a live manual smoke test is:
 ```bash
 bash scripts/disk_audit.sh /tmp/freeup-space-audit.txt
 python3 scripts/generate_report.py /tmp/freeup-space-audit.txt /tmp/freeup-space-report.md
-open /tmp/freeup-space-report.md
+python3 scripts/freeup_space.py plan --input /tmp/freeup-space-audit.txt
 ```
 
 Do not run cleanup commands during validation.

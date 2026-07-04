@@ -6,9 +6,9 @@ A Claude/Codex-friendly macOS storage assistant that performs read-only disk ana
 
 - **Full disk audit**: APFS volumes, Time Machine snapshots, app caches, dev tool caches, cloud sync overhead
 - **Smart questioning**: Asks about your setup (external drives, use case, comfort level) before diving in
-- **Prioritized recommendations**: Grouped into safety tiers — safe caches, movable data, and items requiring judgment
-- **Markdown report**: Generates a saved report with ranked findings and exact cleanup commands
-- **Always asks first**: Never runs cleanup commands without explicit approval
+- **Prioritized recommendations**: Grouped into safety tiers — lower-risk caches, movable data, and items requiring judgment
+- **Markdown report**: Generates a saved report with ranked findings and manual action suggestions
+- **Always asks first**: Never runs cleanup commands or command suggestions without explicit approval
 
 ## Typical Space Recovery
 
@@ -54,6 +54,16 @@ The default workflow saves:
 
 If either file already exists, FreeUp Space uses timestamped names instead of overwriting it.
 
+For a controlled run that does not open the report automatically:
+
+```bash
+freeup-space \
+  --audit-output /tmp/freeup-space-audit.txt \
+  --report-output /tmp/freeup-space-report.md \
+  --no-open \
+  --non-interactive
+```
+
 Run explicit audit and report commands:
 
 ```bash
@@ -66,6 +76,9 @@ Generate a text-only plan from an audit file:
 ```bash
 freeup-space plan --input /tmp/freeup-space-audit.txt
 ```
+
+The plan prints findings and manual action suggestions. It does not execute
+the suggested commands.
 
 Developer and model-review modes use the same safe v0.2 audit/report path and print mode context:
 
@@ -82,7 +95,10 @@ bash uninstall.sh
 
 Live disk audits require macOS. The report generator, doctor command, and fixture-based tests can run on Linux CI, but live audit data depends on macOS tools such as `diskutil`, `tmutil`, `du`, and `open`.
 
-Cleanup commands in reports are recommendations only. FreeUp Space v0.2 does not execute them.
+Command suggestions in reports are recommendations only. FreeUp Space v0.2 does not execute them.
+Review the generated report before running any command yourself.
+Inspect the top findings, audit coverage, lower-risk cache table, and command
+suggestion section before deciding what to do next.
 
 ## Mac Tools Federation
 
@@ -132,6 +148,7 @@ python3 -m py_compile scripts/generate_report.py
 python3 -m py_compile scripts/freeup_space.py
 python3 tests/smoke_test.py
 python3 tests/test_cli_smoke.py
+python3 tests/test_public_readiness.py
 python3 tests/test_federation_contract.py
 ```
 
@@ -160,6 +177,7 @@ You can also run the scripts directly:
 ```bash
 python3 scripts/freeup_space.py --help
 python3 scripts/freeup_space.py doctor
+python3 scripts/freeup_space.py --audit-output /tmp/freeup-space-audit.txt --report-output /tmp/freeup-space-report.md --no-open --non-interactive
 python3 scripts/freeup_space.py report --input tests/fixtures/sample_audit.txt --output /tmp/freeup-space-report.md
 bash scripts/disk_audit.sh /tmp/audit.txt
 python3 scripts/generate_report.py /tmp/audit.txt ~/Desktop/disk-report.md
@@ -189,6 +207,7 @@ The audit script is read-only. It reports disk usage; it does not delete, move, 
 │   ├── smoke_test.py                  # Cross-platform report-generation smoke test
 │   ├── test_cli_smoke.py              # Fixture-based CLI and installer smoke test
 │   ├── test_federation_contract.py    # Fixture-based federation contract smoke test
+│   ├── test_public_readiness.py       # Public-readiness copy and workflow regression test
 │   └── fixtures/sample_audit.txt      # Synthetic macOS audit fixture
 └── evals/
     └── evals.json                     # Skill evaluation cases
@@ -205,8 +224,8 @@ The audit script is read-only. It reports disk usage; it does not delete, move, 
 This project separates **audit**, **recommendation**, and **cleanup execution**.
 
 1. The audit script is read-only.
-2. The report generator creates recommendations but does not execute them.
-3. Cleanup commands must be shown to the user and explicitly approved before execution.
+2. The report generator creates recommendations and manual action suggestions but does not execute them.
+3. Command suggestions must be shown to the user and explicitly approved before execution.
 4. User data should be moved rather than deleted when there is uncertainty.
 5. Destructive commands must never be hidden inside tests, automation, or convenience scripts.
 

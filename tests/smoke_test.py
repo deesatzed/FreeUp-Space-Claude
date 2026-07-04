@@ -47,9 +47,10 @@ def main() -> int:
             "MISSING",
             "SKIPPED",
             "## Directory Sizes",
-            "## Top Caches",
+            "## Lower-Risk Caches",
             "## Largest Applications",
-            "## Quick Cleanup Commands",
+            "## Command Suggestions: Review Before Running",
+            "No command in this report has been run by FreeUp Space.",
             "npm cache clean --force",
             "Expected impact",
         ]
@@ -67,6 +68,8 @@ def main() -> int:
             "yarn cache clean",
             "brew cleanup --prune=all",
             "go clean -cache",
+            "Top Caches (Safe to Clear)",
+            "## Quick Cleanup Commands",
         ]
         unexpected = [phrase for phrase in unexpected_phrases if phrase in report]
         if unexpected:

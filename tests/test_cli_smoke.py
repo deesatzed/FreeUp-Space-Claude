@@ -60,7 +60,18 @@ def main():
             return help_result.returncode
         if not require_phrases(
             help_result.stdout,
-            ["audit", "report", "doctor", "dev", "models", "plan"],
+            [
+                "audit",
+                "report",
+                "doctor",
+                "dev",
+                "models",
+                "plan",
+                "--audit-output",
+                "--report-output",
+                "--no-open",
+                "--non-interactive",
+            ],
             "help",
         ):
             return 1
@@ -99,7 +110,12 @@ def main():
             return plan_result.returncode
         if not require_phrases(
             plan_result.stdout,
-            ["recommendations", "No cleanup commands were executed"],
+            [
+                "review plan",
+                "Manual action suggestions to review before running",
+                "Command text (not executed)",
+                "No cleanup commands were executed",
+            ],
             "plan",
         ):
             return 1

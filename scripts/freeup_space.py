@@ -30,12 +30,14 @@ from generate_report import (  # noqa: E402
 MODE_NOTES = {
     "general": "General mode: read-only audit, Markdown report, and approval-only recommendations.",
     "developer": (
-        "Developer mode: v0.2 uses the safe audit/report path. Deeper project "
-        "and developer artifact classifiers are planned after v0.2."
+        "Developer mode: v0.2 uses the shared safe audit/report path with "
+        "developer-focused framing. Deeper project and developer artifact "
+        "classifiers are planned after v0.2."
     ),
     "models": (
-        "Model review mode: v0.2 uses the safe audit/report path. Detailed "
-        "local model inventory is future work, and no models are deleted."
+        "Model review mode: v0.2 uses the shared safe audit/report path with "
+        "model-storage framing. Detailed local model inventory is future work, "
+        "and no models are deleted."
     ),
 }
 
@@ -116,8 +118,13 @@ def run_command(args):
 def run_audit(output_path):
     output_path = Path(output_path).expanduser()
     ensure_parent(output_path)
-    print("Running read-only audit.")
-    print(f"Audit output: {output_path}")
+    print("Running read-only audit.", flush=True)
+    print(f"Audit output: {output_path}", flush=True)
+    print(
+        "This can take a minute or more while FreeUp Space measures APFS, "
+        "Time Machine, cache, app, and user-directory data.",
+        flush=True,
+    )
     result = run_command(["bash", str(DISK_AUDIT_SCRIPT), str(output_path)])
     if result.returncode != 0:
         print("Audit command failed.", file=sys.stderr)
@@ -133,6 +140,7 @@ def run_report(input_path, output_path):
         print(f"Audit input not found: {input_path}", file=sys.stderr)
         return 2
     ensure_parent(output_path)
+    sys.stdout.flush()
     result = run_command([sys.executable, str(REPORT_GENERATOR), str(input_path), str(output_path)])
     if result.returncode != 0:
         print("Report generation failed.", file=sys.stderr)
@@ -173,8 +181,8 @@ def prompt_for_context(non_interactive=False):
 
 
 def run_audit_report_flow(mode, audit_output=None, report_output=None, no_open=False, non_interactive=False):
-    print("FreeUp Space v0.2")
-    print(MODE_NOTES[mode])
+    print("FreeUp Space v0.2", flush=True)
+    print(MODE_NOTES[mode], flush=True)
     prompt_for_context(non_interactive=non_interactive)
 
     audit_path = Path(audit_output).expanduser() if audit_output else default_audit_path()
@@ -189,7 +197,7 @@ def run_audit_report_flow(mode, audit_output=None, report_output=None, no_open=F
         return report_status
 
     maybe_open_report(report_path, no_open=no_open)
-    print("\nNext step: review the Markdown report and approve any cleanup command manually.")
+    print("\nNext step: review the Markdown report and approve any command suggestion manually.")
     print(f"Report: {report_path}")
     return 0
 
@@ -216,7 +224,7 @@ def run_plan(input_path, output_path=None):
     findings = collect_findings(content)
     commands = build_tailored_commands(findings, extract_snapshot_count(content))
 
-    print("FreeUp Space recommendations")
+    print("FreeUp Space review plan")
     print("No cleanup commands were executed.")
 
     if findings:
@@ -229,16 +237,16 @@ def run_plan(input_path, output_path=None):
         print("\nNo size-ranked findings were parsed from the audit input.")
 
     if commands:
-        print("\nCleanup commands to review manually:")
+        print("\nManual action suggestions to review before running:")
         for command in commands[:5]:
             impact = bytes_to_human(command["bytes"]) if command["bytes"] else "Not directly measurable"
             print(f"- Expected impact: {impact}")
             print(f"  Why shown: {command['why']}")
-            print(f"  Command text: {command['command']}")
+            print(f"  Command text (not executed): {command['command']}")
     else:
-        print("\nNo tailored cleanup command text was generated from this audit.")
+        print("\nNo tailored manual action text was generated from this audit.")
 
-    print("\nReview the full report before approving any action.")
+    print("\nReview the full report before approving or running any action.")
     return 0
 
 
@@ -305,9 +313,11 @@ def build_parser():
         prog="freeup-space",
         description=(
             "Safety-first macOS storage audit and report tool. It never deletes, "
-            "moves, clears caches, thins snapshots, or runs sudo."
+            "moves, clears caches, thins snapshots, or runs sudo. With no "
+            "command, it runs the default audit/report workflow."
         ),
     )
+    add_flow_options(parser)
     subparsers = parser.add_subparsers(dest="command")
 
     audit_parser = subparsers.add_parser("audit", help="Run the read-only disk audit.")
@@ -319,13 +329,19 @@ def build_parser():
 
     subparsers.add_parser("doctor", help="Check Python, Bash, script paths, Desktop, and macOS tools.")
 
-    dev_parser = subparsers.add_parser("dev", help="Run safe audit/report flow with developer-mode context.")
+    dev_parser = subparsers.add_parser(
+        "dev",
+        help="Run the shared safe audit/report flow with developer-mode framing.",
+    )
     add_flow_options(dev_parser)
 
-    models_parser = subparsers.add_parser("models", help="Run safe audit/report flow with model-review context.")
+    models_parser = subparsers.add_parser(
+        "models",
+        help="Run the shared safe audit/report flow with model-storage framing.",
+    )
     add_flow_options(models_parser)
 
-    plan_parser = subparsers.add_parser("plan", help="Print report recommendations without executing them.")
+    plan_parser = subparsers.add_parser("plan", help="Print advisory recommendations without executing them.")
     plan_parser.add_argument("--input", required=True, help="Audit text file to read.")
     plan_parser.add_argument("--output", help="Optional Markdown report output path.")
 
@@ -337,7 +353,13 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     if args.command is None:
-        return run_audit_report_flow("general")
+        return run_audit_report_flow(
+            "general",
+            audit_output=args.audit_output,
+            report_output=args.report_output,
+            no_open=args.no_open,
+            non_interactive=args.non_interactive,
+        )
     if args.command == "audit":
         return run_audit(Path(args.output).expanduser() if args.output else default_audit_path())
     if args.command == "report":

@@ -101,7 +101,7 @@ def categorize_path(path):
 def risk_for_category(category):
     """Return user-facing cleanup risk text for a finding category."""
     risks = {
-        'cache': 'Low - regenerable',
+        'cache': 'Lower risk - regenerable',
         'dev-tools': 'Low/Medium - rebuild or re-download cost',
         'app': 'Judgment required',
         'app-data': 'Medium - may contain app state',
@@ -267,6 +267,12 @@ def generate_report(audit_file, output_file):
         report.append("```")
         report.append(section.strip())
         report.append("```\n")
+        report.append(
+            "**macOS storage note:** APFS separates the sealed system volume "
+            "from the writable Data volume. The `df -h /` line may show the "
+            "sealed system snapshot, while user-directory and APFS/Data volume "
+            "sections show where most app, cache, and user data lives.\n"
+        )
 
     # Parse snapshot count
     if 'Snapshot count:' in content:
@@ -275,8 +281,8 @@ def generate_report(audit_file, output_file):
             snapshot_count = int(match.group(1))
             report.append(f"### Time Machine Local Snapshots: **{snapshot_count}**")
             if snapshot_count > 10:
-                report.append(f"> ⚠️ {snapshot_count} local snapshots detected. These consume invisible disk space")
-                report.append(f"> (typically 50-150 GB). Consider thinning with:")
+                report.append(f"> {snapshot_count} local snapshots detected. These consume invisible disk space")
+                report.append(f"> (typically 50-150 GB). Manual command suggestion, not executed:")
                 report.append(f"> `sudo tmutil thinlocalsnapshots / 86400 1`\n")
 
     if findings:
@@ -313,7 +319,7 @@ def generate_report(audit_file, output_file):
     if section:
         entries = parse_du_lines(section)
         if entries:
-            report.append("## Top Caches (Safe to Clear)\n")
+            report.append("## Lower-Risk Caches (Review Before Clearing)\n")
             report.append("| Cache | Size | Category |")
             report.append("|-------|------|----------|")
             total_cache = 0
@@ -349,7 +355,8 @@ def generate_report(audit_file, output_file):
             report.append("These regenerable paths are currently being backed up unnecessarily:\n")
             for p in included:
                 report.append(f"- `{p}`")
-            report.append("\nRun these to exclude them:")
+            report.append("\nCommand suggestions to review before running:")
+            report.append("No command in this section has been run by FreeUp Space.")
             report.append("```bash")
             for p in included:
                 report.append(f'sudo tmutil addexclusion "{p}"')
@@ -371,8 +378,13 @@ def generate_report(audit_file, output_file):
         report.append("")
 
     # Recommendations
-    report.append("## Quick Cleanup Commands\n")
-    report.append("These commands are suggestions only. Review and approve any command before running it.\n")
+    report.append("## Command Suggestions: Review Before Running\n")
+    report.append("No command in this report has been run by FreeUp Space.")
+    report.append(
+        "These are manual suggestions based on measured findings. Review the "
+        "path, risk, side effects, and approval boundary before running "
+        "anything.\n"
+    )
     tailored_commands = build_tailored_commands(findings, snapshot_count)
     if tailored_commands:
         report.append("| Expected impact | Why shown | Command |")
@@ -388,7 +400,7 @@ def generate_report(audit_file, output_file):
             )
         report.append("")
     else:
-        report.append("No tailored cleanup commands were generated from the measured findings.\n")
+        report.append("No tailored manual action suggestions were generated from the measured findings.\n")
 
     with open(output_file, 'w') as f:
         f.write('\n'.join(report))
